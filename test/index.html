@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>picker test</title>
+    <style>
+        ul,li{margin:0;padding:0;}
+        .pickerc{
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color:#fff;
+            /* padding-top: 30px; */
+            padding-bottom: 30px;
+            z-index: 10;
+            overflow: hidden;
+            height: 220px;
+        }
+        .picker-mask{
+            position: fixed;
+            top:0;
+            left:0;
+            height: 100%;
+            width: 100%;
+            background-color: rgba(0, 0, 0, .6);
+        }
+        .pickers{
+            /* position: absolute; */
+            text-align: center;
+        }
+        .picker-viewport{
+            width: 100%;
+            height: 30px;
+            border-top: 1px solid #ccc;
+            border-bottom: 1px solid #ccc;
+            position: absolute;
+            top: 50%;
+            margin-top: -15px;
+        }
+        .picker-item{
+            padding: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Picker test</h1>
+    <div class="pickerc">
+        <div class="picker-wheel">
+            <ul class="pickers">
+                <li class="picker-item">星期一</li>
+                <li class="picker-item">星期二</li>
+                <li class="picker-item">星期三</li>
+                <li class="picker-item">星期四</li>
+                <li class="picker-item">星期五</li>
+                <li class="picker-item">星期六</li>
+                <li class="picker-item">星期日</li>
+            </ul>
+        </div>
+        <div class="picker-viewport"></div>
+    </div>
+    <div class="picker-mask"></div>
+    <script src="../dist/picker.js"></script>
+    <script>
+        new Picker({
+            con: '.pickerc'
+        });
+    </script>
+</body>
+</html>
