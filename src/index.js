@@ -16,6 +16,7 @@ function Picker(opts){
     this.lastMoveY = 0; 
     this.touching = true;
     this.touchStart = 0;
+    this.transTime = 700;
     
     //列表初始化为第一项在视口位置
     this.viewportTop = this.viewport.getBoundingClientRect().top - 
@@ -71,18 +72,20 @@ Picker.prototype._touchend = function(e){
 Picker.prototype._fixScroll = function(){
     var currentY = this._getTranslate(this.movec,'y');
     var viewportTop = this.viewportTop;
-    var time = 0;
+    var transTime = this.transTime;
     //向下超出
     var bottomBoundary = viewportTop;
     //向上超出
     var topBoundary = viewportTop - this.movecHeight + this.itemHeight;
     var activeIndex = 0;
     if(currentY > bottomBoundary){
-        this._translateTimeAbs(this.movec,bottomBoundary,time);
+        // this._translateTimeAbs(this.movec,bottomBoundary,time);
+        this._translateTime(this.movec, bottomBoundary - currentY, transTime);
         activeIndex = 0;
     }
     else if(currentY < topBoundary){
-        this._translateTimeAbs(this.movec,topBoundary,time);
+        // this._translateTimeAbs(this.movec,topBoundary,time);
+        this._translateTime(this.movec, topBoundary - currentY, transTime);
         activeIndex = this.itemLen - 1;
     }
     else{
@@ -91,19 +94,27 @@ Picker.prototype._fixScroll = function(){
             var bottom = viewportTop - i * this.itemHeight,
                 top = viewportTop - (i+1) * this.itemHeight;
             if(top < currentY && currentY < bottom){
+                // if(Math.abs(top - currentY) < Math.abs(currentY - bottom)){
+                //     this._translateTimeAbs(this.movec,top,time);
+                //     activeIndex = i+1;
+                // }
+                // else{
+                //     this._translateTimeAbs(this.movec,bottom,time);
+                //     activeIndex = i;
+                // }
+                // console.log('detlaY ' + this.detlaY);
                 if(Math.abs(top - currentY) < Math.abs(currentY - bottom)){
-                    this._translateTimeAbs(this.movec,top,time);
+                    this._translateTime(this.movec, top - currentY, transTime);
                     activeIndex = i+1;
                 }
                 else{
-                    this._translateTimeAbs(this.movec,bottom,time);
+                    this._translateTime(this.movec, bottom - currentY, transTime);
                     activeIndex = i;
                 }
             }
         }
     }
     //active item激活
-    console.log('activeIndex ' + activeIndex);
     for(var i=0;i<this.itemLen;i++){
         this._removeClass(this.pickerItems[i],'active');
     }
