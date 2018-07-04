@@ -95,9 +95,11 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 function Picker(opts) {
     opts = (0, _objectAssign2.default)({
-        con: '.pickerc'
+        con: '.pickerc',
+        change: function change() {}
     }, opts);
 
+    this.opts = opts;
     this.con = document.querySelector(opts.con);
     this.movec = this.con.querySelector('.pickers');
     this.pickerItems = this.movec.querySelectorAll('.picker-item');
@@ -106,6 +108,7 @@ function Picker(opts) {
     this.startY = 0;
     this.lastMoveY = 0;
     this.touching = true;
+    this.touchStart = 0;
 
     //列表初始化为第一项在视口位置
     this.viewportTop = this.viewport.getBoundingClientRect().top - this.con.getBoundingClientRect().top;
@@ -124,6 +127,7 @@ Picker.prototype._touchstart = function (e) {
     this.startY = touch.pageY;
     this.lastMoveY = touch.pageY;
     this.touching = true;
+    this.touchStart = +new Date();
 };
 
 Picker.prototype._touchmove = function (e) {
@@ -134,24 +138,74 @@ Picker.prototype._touchmove = function (e) {
             detlaY = moveY - this.lastMoveY;
         this._move(this.movec, detlaY);
         this.lastMoveY = moveY;
+        this.detlaY = detlaY;
     }
 };
 
 Picker.prototype._touchend = function (e) {
+    var self = this;
     this.touching = false;
+
+    var touchEnd = +new Date();
+    //小于300，快滑
+    var interiaRatio = 7;
+    if (touchEnd - this.touchStart < 300) {
+        this._translateTime(this.movec, this.detlaY * interiaRatio, 700, function () {
+            self._fixScroll();
+        });
+    }
+    //慢滑
+    else {
+            self._fixScroll();
+        }
+};
+
+Picker.prototype._fixScroll = function () {
     var currentY = this._getTranslate(this.movec, 'y');
     var viewportTop = this.viewportTop;
+    var time = 0;
     //向下超出
     var bottomBoundary = viewportTop;
-    if (currentY > bottomBoundary) {
-        this._translate(this.movec, bottomBoundary);
-    }
     //向上超出
     var topBoundary = viewportTop - this.movecHeight + this.itemHeight;
-    if (currentY < topBoundary) {
-        this._translate(this.movec, topBoundary);
+    var activeIndex = 0;
+    if (currentY > bottomBoundary) {
+        this._translateTimeAbs(this.movec, bottomBoundary, time);
+        activeIndex = 0;
+    } else if (currentY < topBoundary) {
+        this._translateTimeAbs(this.movec, topBoundary, time);
+        activeIndex = this.itemLen - 1;
+    } else {
+        //中间未对其
+        for (var i = 0; i < this.itemLen; i++) {
+            var bottom = viewportTop - i * this.itemHeight,
+                top = viewportTop - (i + 1) * this.itemHeight;
+            if (top < currentY && currentY < bottom) {
+                if (Math.abs(top - currentY) < Math.abs(currentY - bottom)) {
+                    this._translateTimeAbs(this.movec, top, time);
+                    activeIndex = i + 1;
+                } else {
+                    this._translateTimeAbs(this.movec, bottom, time);
+                    activeIndex = i;
+                }
+            }
+        }
     }
-    //中间未对其
+    //active item激活
+    console.log('activeIndex ' + activeIndex);
+    for (var i = 0; i < this.itemLen; i++) {
+        this._removeClass(this.pickerItems[i], 'active');
+    }
+    this._addClass(this.pickerItems[activeIndex], 'active');
+    // this._fixRotate(activeIndex);
+};
+
+Picker.prototype._fixRotate = function (activeIndex) {
+    var pickerItems = this.pickerItems,
+        itemLen = this.itemLen;
+    for (var i = 0; i < itemLen; i++) {
+        pickerItems[i].style.transform = 'rotateX(' + (i - activeIndex) * 25 + 'deg)';
+    }
 };
 
 Picker.prototype._move = function (dom, detlaY) {
@@ -186,6 +240,69 @@ Picker.prototype._getTranslate = function (dom, type) {
         transRes = parseInt(aTrans[map[type]]);
     }
     return transRes;
+};
+
+Picker.prototype._transitionTime = function (dom, time) {
+    dom.style.transitionDuration = time + 'ms';
+    dom.style.webKitTransitionDuration = time + 'ms';
+};
+
+Picker.prototype._translateTime = function (dom, distance, time, callback) {
+    var self = this;
+    self._transitionTime(dom, time);
+    self._move(dom, distance);
+    addTransitionEnd(dom, function () {
+        self._transitionTime(dom, 0);
+        callback && callback();
+    }, time);
+};
+
+Picker.prototype._translateTimeAbs = function (dom, distance, time, callback) {
+    var self = this;
+    self._transitionTime(dom, time);
+    self._translate(dom, distance);
+    addTransitionEnd(dom, function () {
+        self._transitionTime(dom, 0);
+        callback && callback();
+    }, time);
+};
+
+Picker.prototype._addClass = function (dom, className) {
+    dom.classList.add(className);
+};
+
+Picker.prototype._removeClass = function (dom, className) {
+    dom.classList.remove(className);
+};
+
+var transitionEnd = function () {
+    var body = document.body || document.documentElement,
+        style = body.style;
+    var transEndEventNames = {
+        WebkitTransition: 'webkitTransitionEnd',
+        MozTransition: 'transitionend',
+        OTransition: 'oTransitionEnd otransitionend',
+        transition: 'transitionend'
+    };
+    for (var name in transEndEventNames) {
+        if (typeof style[name] === "string") {
+            return transEndEventNames[name];
+        }
+    }
+}();
+
+function addTransitionEnd(elem, fn, duration) {
+    var called = false;
+    var callback = function callback() {
+        if (!called) {
+            fn();
+            called = true;
+        }
+    };
+    elem.addEventListener(transitionEnd, function () {
+        callback();
+        setTimeout(callback, duration);
+    }, false);
 };
 
 function mid(mid, min, max) {

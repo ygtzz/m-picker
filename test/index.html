@@ -28,8 +28,9 @@
             background-color: rgba(0, 0, 0, .6);
         }
         .pickers{
-            /* position: absolute; */
             text-align: center;
+            transition: cubic-bezier(0.23, 1, 0.32, 1) 0s;
+            -webkit-transition: cubic-bezier(0.23, 1, 0.32, 1) 0s;
         }
         .picker-viewport{
             width: 100%;
@@ -42,24 +43,56 @@
         }
         .picker-item{
             padding: 10px 0;
+            color:#333;
+        }
+        .picker-item.active{
+            color:red;
+            white-space: nowrap;
+        }
+        .picker-wheels{
+            position: relative;
+        }
+        .picker-wheel{
+            perspective: 800px;
+            -webkit-perspective: 800px;
+            transform-style: preserve-3d;
+            -webkit-transform-style: preserve-3d;
+        }
+        .pickers{
+            transform-style: preserve-3d;
+            -webkit-transform-style: preserve-3d;
+        }
+        .picker-shadowmask{
+            position: absolute;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: -webkit-gradient(linear,left top,left bottom,from(#ffffff),color-stop(rgba(255,255,255,0)),to(#ffffff));
+            background: -webkit-linear-gradient(top,#ffffff,rgba(255,255,255,0),#ffffff);
+            background: linear-gradient(to bottom,#ffffff,rgba(255,255,255,0),#ffffff);
+            opacity: .9;
+            pointer-events: none;
         }
     </style>
 </head>
 <body>
     <h1>Picker test</h1>
     <div class="pickerc">
-        <div class="picker-wheel">
-            <ul class="pickers">
-                <li class="picker-item">星期一</li>
-                <li class="picker-item">星期二</li>
-                <li class="picker-item">星期三</li>
-                <li class="picker-item">星期四</li>
-                <li class="picker-item">星期五</li>
-                <li class="picker-item">星期六</li>
-                <li class="picker-item">星期日</li>
-            </ul>
+        <div class="picker-wheels">
+            <div class="picker-wheel">
+                <ul class="pickers">
+                    <li class="picker-item">星期一</li>
+                    <li class="picker-item">星期二</li>
+                    <li class="picker-item">星期三</li>
+                    <li class="picker-item">星期四</li>
+                    <li class="picker-item">星期五</li>
+                    <li class="picker-item">星期六</li>
+                    <li class="picker-item">星期日</li>
+                </ul>
+            </div>
         </div>
         <div class="picker-viewport"></div>
+        <div class="picker-shadowmask"></div>
     </div>
     <div class="picker-mask"></div>
     <script src="../dist/picker.js"></script>
