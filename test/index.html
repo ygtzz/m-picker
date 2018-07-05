@@ -7,7 +7,7 @@
     <title>picker test</title>
     <style>
         ul,li{margin:0;padding:0;}
-        .pickerc{
+        .pickerwheelc{
             position: absolute;
             bottom: 0;
             left: 0;
@@ -19,7 +19,7 @@
             overflow: hidden;
             height: 220px;
         }
-        .picker-mask{
+        .picker-pagemask{
             position: fixed;
             top:0;
             left:0;
@@ -53,6 +53,9 @@
             position: relative;
         }
         .picker-wheel{
+            float: left;
+        }
+        /* .picker-wheel{
             perspective: 800px;
             -webkit-perspective: 800px;
             transform-style: preserve-3d;
@@ -61,8 +64,8 @@
         .pickers{
             transform-style: preserve-3d;
             -webkit-transform-style: preserve-3d;
-        }
-        .picker-shadowmask{
+        } */
+        .picker-wheelmask{
             position: absolute;
             top: 0;
             width: 100%;
@@ -77,29 +80,62 @@
 </head>
 <body>
     <h1>Picker test</h1>
-    <div class="pickerc">
-        <div class="picker-wheels">
-            <div class="picker-wheel">
-                <ul class="pickers">
-                    <li class="picker-item">星期一</li>
-                    <li class="picker-item">星期二</li>
-                    <li class="picker-item">星期三</li>
-                    <li class="picker-item">星期四</li>
-                    <li class="picker-item">星期五</li>
-                    <li class="picker-item">星期六</li>
-                    <li class="picker-item">星期日</li>
-                </ul>
+    <!-- <div class="pickerc">
+        <div class="pickerwheelc">
+            <div class="picker-wheels">
+                <div class="picker-wheel">
+                    <ul class="pickers">
+                        <li class="picker-item">星期一</li>
+                        <li class="picker-item">星期二</li>
+                        <li class="picker-item">星期三</li>
+                        <li class="picker-item">星期四</li>
+                        <li class="picker-item">星期五</li>
+                        <li class="picker-item">星期六</li>
+                        <li class="picker-item">星期日</li>
+                    </ul>
+                </div>
             </div>
+            <div class="picker-viewport"></div>
+            <div class="picker-wheelmask"></div>
         </div>
-        <div class="picker-viewport"></div>
-        <div class="picker-shadowmask"></div>
-    </div>
-    <div class="picker-mask"></div>
+        <div class="picker-pagemask"></div>
+    </div> -->
     <script src="../dist/picker.js"></script>
     <script>
         new Picker({
-            con: '.pickerc'
+            con: '.pickerc',
+            data: [
+                ['星期一','星期二','星期三','星期四','星期五','星期六','星期日'],
+                ['10:00','11:00','12:00','13:00','14:00']
+             ],
+            change: function(val){
+                console.log('val: ' + val);
+            }
         });
+        // new Picker({
+        //     con: '.pickerc',
+        //     data: [
+        //         [{
+        //             id:'1',
+        //             value:'附近',
+        //             childs:[
+        //                 {id:'1',value:'1000米'},
+        //                 {id:'2',value:'2000米'},
+        //                 {id:'3',value:'3000米'},
+        //                 {id:'4',value:'5000米'},
+        //                 {id:'5',value:'10000米'}
+        //             ]
+        //         },
+        //         {id:'2',value:'上城区'},
+        //         {id:'3',value:'下城区'},
+        //         {id:'4',value:'江干区'},
+        //         {id:'5',value:'拱墅区'},
+        //         {id:'6',value:'西湖区'}]
+        //     ],
+        //     change: function(val){
+        //         console.log('val: ' + val);
+        //     }
+        // });
     </script>
 </body>
 </html>

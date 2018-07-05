@@ -3,32 +3,87 @@ import assign from 'object-assign';
 function Picker(opts){
     opts = assign({
         con:'.pickerc',
+        data: [],
         change: function(){}
     }, opts);
 
+    var self = this;
     this.opts = opts;
-    this.con = document.querySelector(opts.con);
-    this.movec = this.con.querySelector('.pickers');
-    this.pickerItems = this.movec.querySelectorAll('.picker-item');
-    this.itemLen = this.pickerItems.length;
-    this.viewport = this.con.querySelector('.picker-viewport');
+    //插入html
+    this._build();
+    
     this.startY = 0;
     this.lastMoveY = 0; 
     this.touching = true;
     this.touchStart = 0;
     this.transTime = 700;
-    
+    //获取dom
+    this.pickerc = document.querySelector(opts.con);
+    this.con = this.pickerc.querySelector('.pickerwheelc');
+    this.movec = this.con.querySelector('.pickers');
+    this.pickerItems = this.movec.querySelectorAll('.picker-item');
+    this.itemLen = this.pickerItems.length;
+    this.viewport = this.con.querySelector('.picker-viewport');
+    // this.wheels = Array.prototype.slice.call(this.pickerc.querySelectorAll('.picker-wheel'));
+    // this.wheels.forEach(function(item){
+    //     self.con.addEventListener('touchstart',self._touchstart.bind(self,item));
+    //     self.con.addEventListener('touchmove',self._touchmove.bind(self));
+    //     self.con.addEventListener('touchend',self._touchend.bind(self));
+    // });
     //列表初始化为第一项在视口位置
-    this.viewportTop = this.viewport.getBoundingClientRect().top - 
-              this.con.getBoundingClientRect().top;
-    this._translate(this.movec, this.viewportTop);
-    this.movecHeight = this.movec.getBoundingClientRect().height;
-    this.itemHeight = this.movecHeight / this.itemLen;
-    this.viewport.style.height = this.itemHeight + 'px';
+    self.viewportTop = self.viewport.getBoundingClientRect().top - self.con.getBoundingClientRect().top;
+    self._translate(self.movec, self.viewportTop);
+    self.movecHeight = self.movec.getBoundingClientRect().height;
+    self.itemHeight = self.movecHeight / self.itemLen;
+    self.viewport.style.height = self.itemHeight + 'px';
     
     this.con.addEventListener('touchstart',this._touchstart.bind(this));
     this.con.addEventListener('touchmove',this._touchmove.bind(this));
     this.con.addEventListener('touchend',this._touchend.bind(this));
+}
+
+Picker.prototype._build = function(){
+    var data = this.opts.data;
+    if(!Array.isArray(data)){
+        throw new Error('picker data must be a array');
+        return;
+    }
+    var len = data.length,
+        width = 100/len + '%';
+    var wheelHtml = data.map(function(item){
+        if(!Array.isArray(item)){
+            throw new Error('picker data must be a 2d array');
+        }
+        var itemHtml;
+        if(typeof item[0] == 'string'){
+            itemHtml = item.map(function(item){
+                return '<li class="picker-item">' + item + '</li>'
+            });
+        }
+        else{
+            itemHtml = item.map(function(item){
+                return '<li data-id="' + item.id + '" class="picker-item">' + item.value + '</li>'
+            });
+        }
+        itemHtml = itemHtml.join('');
+        return `<div class="picker-wheel" style="width:${width}">
+                    <ul class="pickers">
+                        ${itemHtml}
+                    </ul>
+                </div>`;
+    }).join('');
+    var pickerHtml = `<div class="pickerc">
+                        <div class="pickerwheelc">
+                            <div class="picker-wheels">
+                                ${wheelHtml}
+                            </div>
+                            <div class="picker-viewport"></div>
+                            <div class="picker-wheelmask"></div>
+                        </div>
+                        <div class="picker-pagemask"></div>
+                    </div>`;
+
+    document.body.insertAdjacentHTML('beforeend',pickerHtml);
 }
 
 Picker.prototype._touchstart = function(e){
@@ -37,6 +92,17 @@ Picker.prototype._touchstart = function(e){
     this.lastMoveY = touch.pageY;
     this.touching = true;
     this.touchStart = +new Date();
+    //set active wheel
+    // this.movec = item.querySelector('.pickers');
+    // this.pickerItems = item.querySelectorAll('.picker-item');
+    // this.itemLen = this.pickerItems.length;
+
+    // var self = this;
+    // self.viewportTop = self.viewport.getBoundingClientRect().top - self.con.getBoundingClientRect().top;
+    // self._translate(self.movec, self.viewportTop);
+    // self.movecHeight = self.movec.getBoundingClientRect().height;
+    // self.itemHeight = self.movecHeight / self.itemLen;
+    // self.viewport.style.height = self.itemHeight + 'px';
 }
 
 Picker.prototype._touchmove = function(e){
@@ -77,14 +143,12 @@ Picker.prototype._fixScroll = function(){
     var bottomBoundary = viewportTop;
     //向上超出
     var topBoundary = viewportTop - this.movecHeight + this.itemHeight;
-    var activeIndex = 0;
+    var activeIndex;
     if(currentY > bottomBoundary){
-        // this._translateTimeAbs(this.movec,bottomBoundary,time);
         this._translateTime(this.movec, bottomBoundary - currentY, transTime);
         activeIndex = 0;
     }
     else if(currentY < topBoundary){
-        // this._translateTimeAbs(this.movec,topBoundary,time);
         this._translateTime(this.movec, topBoundary - currentY, transTime);
         activeIndex = this.itemLen - 1;
     }
@@ -93,16 +157,7 @@ Picker.prototype._fixScroll = function(){
         for(var i=0;i<this.itemLen;i++){
             var bottom = viewportTop - i * this.itemHeight,
                 top = viewportTop - (i+1) * this.itemHeight;
-            if(top < currentY && currentY < bottom){
-                // if(Math.abs(top - currentY) < Math.abs(currentY - bottom)){
-                //     this._translateTimeAbs(this.movec,top,time);
-                //     activeIndex = i+1;
-                // }
-                // else{
-                //     this._translateTimeAbs(this.movec,bottom,time);
-                //     activeIndex = i;
-                // }
-                // console.log('detlaY ' + this.detlaY);
+            if(top < currentY && currentY <= bottom){
                 if(Math.abs(top - currentY) < Math.abs(currentY - bottom)){
                     this._translateTime(this.movec, top - currentY, transTime);
                     activeIndex = i+1;
@@ -114,12 +169,18 @@ Picker.prototype._fixScroll = function(){
             }
         }
     }
+    this._changeActiveItem();
+    // this._fixRotate(activeIndex);
+}
+
+Picker.prototype._changeActiveItem = function(){
     //active item激活
     for(var i=0;i<this.itemLen;i++){
         this._removeClass(this.pickerItems[i],'active');
     }
     this._addClass(this.pickerItems[activeIndex],'active');
-    // this._fixRotate(activeIndex);
+    //todo 添加activeItem content
+    this.change(activeIndex);
 }
 
 Picker.prototype._fixRotate = function(activeIndex){
@@ -131,13 +192,8 @@ Picker.prototype._fixRotate = function(activeIndex){
 }
 
 Picker.prototype._move = function(dom,detlaY){
-    // var self = this,
-    //     leftBoundary = self.leftBoundary,
-    //     rightBoundary = self.rightBoundary;
-    //     oPlayer = self.oPlayer,
     var originY = this._getTranslate(dom,'y'),
         y = originY + detlaY;
-    // x = mid(x,leftBoundary,rightBoundary);
     this._translate(dom,y);
 }
 
@@ -173,7 +229,7 @@ Picker.prototype._translateTime = function(dom,distance,time,callback){
     var self = this;
     self._transitionTime(dom,time);
     self._move(dom,distance);
-    addTransitionEnd(dom,function(){
+    addTransitionEndOnce(dom,function(){
         self._transitionTime(dom, 0);
         callback && callback();
     },time);
@@ -183,7 +239,7 @@ Picker.prototype._translateTimeAbs = function(dom,distance,time,callback){
     var self = this;
     self._transitionTime(dom,time);
     self._translate(dom,distance);
-    addTransitionEnd(dom,function(){
+    addTransitionEndOnce(dom,function(){
         self._transitionTime(dom, 0);
         callback && callback();
     },time);
@@ -213,19 +269,21 @@ var	transitionEnd=(function(){
     }
 })();
 
-function addTransitionEnd(elem,fn,duration){	
+function addTransitionEndOnce(elem,fn,duration){	
     var called = false;
     var callback = function(){
         if (!called){
             fn();
-            called=true;
+            called = true;
         }
     };
-    elem.addEventListener(transitionEnd,function(){
+    var callbackEnd = function(){
         callback();
-        setTimeout(callback,duration);
-    },false);
-};
+        setTimeout(callback, duration);
+        elem.removeEventListener(transitionEnd, callbackEnd);
+    }
+    elem.addEventListener(transitionEnd, callbackEnd);
+}
 
 function mid(mid,min,max){
     if(typeof min === undefined || min == null){
