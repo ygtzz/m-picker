@@ -20,26 +20,26 @@ function Picker(opts){
     //获取dom
     this.pickerc = document.querySelector(opts.con);
     this.con = this.pickerc.querySelector('.pickerwheelc');
-    this.movec = this.con.querySelector('.pickers');
-    this.pickerItems = this.movec.querySelectorAll('.picker-item');
-    this.itemLen = this.pickerItems.length;
     this.viewport = this.con.querySelector('.picker-viewport');
-    // this.wheels = Array.prototype.slice.call(this.pickerc.querySelectorAll('.picker-wheel'));
-    // this.wheels.forEach(function(item){
-    //     self.con.addEventListener('touchstart',self._touchstart.bind(self,item));
-    //     self.con.addEventListener('touchmove',self._touchmove.bind(self));
-    //     self.con.addEventListener('touchend',self._touchend.bind(self));
-    // });
+    // this.movec = this.con.querySelector('.pickers');
+    // this.pickerItems = this.movec.querySelectorAll('.picker-item');
+    // this.itemLen = this.pickerItems.length;
+    this.wheels = Array.prototype.slice.call(this.pickerc.querySelectorAll('.picker-wheel'));
+    this.wheels.forEach(function(item){
+        item.addEventListener('touchstart',self._touchstart.bind(self,item));
+        item.addEventListener('touchmove',self._touchmove.bind(self));
+        item.addEventListener('touchend',self._touchend.bind(self));
+    });
     //列表初始化为第一项在视口位置
-    self.viewportTop = self.viewport.getBoundingClientRect().top - self.con.getBoundingClientRect().top;
-    self._translate(self.movec, self.viewportTop);
-    self.movecHeight = self.movec.getBoundingClientRect().height;
-    self.itemHeight = self.movecHeight / self.itemLen;
-    self.viewport.style.height = self.itemHeight + 'px';
+    // self.viewportTop = self.viewport.getBoundingClientRect().top - self.con.getBoundingClientRect().top;
+    // self._translate(self.movec, self.viewportTop);
+    // self.movecHeight = self.movec.getBoundingClientRect().height;
+    // self.itemHeight = self.movecHeight / self.itemLen;
+    // self.viewport.style.height = self.itemHeight + 'px';
     
-    this.con.addEventListener('touchstart',this._touchstart.bind(this));
-    this.con.addEventListener('touchmove',this._touchmove.bind(this));
-    this.con.addEventListener('touchend',this._touchend.bind(this));
+    // this.con.addEventListener('touchstart',this._touchstart.bind(this));
+    // this.con.addEventListener('touchmove',this._touchmove.bind(this));
+    // this.con.addEventListener('touchend',this._touchend.bind(this));
 }
 
 Picker.prototype._build = function(){
@@ -86,23 +86,24 @@ Picker.prototype._build = function(){
     document.body.insertAdjacentHTML('beforeend',pickerHtml);
 }
 
-Picker.prototype._touchstart = function(e){
+Picker.prototype._touchstart = function(item,e){
+    console.log(item);
     var touch = e.touches[0];
     this.startY = touch.pageY;
     this.lastMoveY = touch.pageY;
     this.touching = true;
     this.touchStart = +new Date();
     //set active wheel
-    // this.movec = item.querySelector('.pickers');
-    // this.pickerItems = item.querySelectorAll('.picker-item');
-    // this.itemLen = this.pickerItems.length;
+    this.movec = item.querySelector('.pickers');
+    this.pickerItems = item.querySelectorAll('.picker-item');
+    this.itemLen = this.pickerItems.length;
 
-    // var self = this;
-    // self.viewportTop = self.viewport.getBoundingClientRect().top - self.con.getBoundingClientRect().top;
-    // self._translate(self.movec, self.viewportTop);
-    // self.movecHeight = self.movec.getBoundingClientRect().height;
-    // self.itemHeight = self.movecHeight / self.itemLen;
-    // self.viewport.style.height = self.itemHeight + 'px';
+    var self = this;
+    self.viewportTop = self.viewport.getBoundingClientRect().top - self.con.getBoundingClientRect().top;
+    self._translate(self.movec, self.viewportTop);
+    self.movecHeight = self.movec.getBoundingClientRect().height;
+    self.itemHeight = self.movecHeight / self.itemLen;
+    self.viewport.style.height = self.itemHeight + 'px';
 }
 
 Picker.prototype._touchmove = function(e){
