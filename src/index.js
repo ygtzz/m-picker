@@ -11,24 +11,33 @@ function Picker(opts){
     this.opts = opts;
     //插入html
     this._build();
-    
-    this.startY = 0;
-    this.lastMoveY = 0; 
-    this.touching = true;
-    this.touchStart = 0;
-    this.transTime = 700;
     //获取dom
     this.pickerc = document.querySelector(opts.con);
     this.con = this.pickerc.querySelector('.pickerwheelc');
     this.viewport = this.con.querySelector('.picker-viewport');
+    //下一步思路
+    //1.将滑动数据用数组保存
+    //2.将位置尺寸数据用数组保存
+    // this.startY = 0;
+    // this.lastMoveY = 0; 
+    // this.touching = true;
+    // this.touchStart = 0;
+    this.transTime = 700;
+    this.touches = [];
     // this.movec = this.con.querySelector('.pickers');
     // this.pickerItems = this.movec.querySelectorAll('.picker-item');
     // this.itemLen = this.pickerItems.length;
     this.wheels = Array.prototype.slice.call(this.pickerc.querySelectorAll('.picker-wheel'));
-    this.wheels.forEach(function(item){
-        item.addEventListener('touchstart',self._touchstart.bind(self,item));
-        item.addEventListener('touchmove',self._touchmove.bind(self));
-        item.addEventListener('touchend',self._touchend.bind(self));
+    this.wheels.forEach(function(item,index){
+        self.touches[index] = {
+            startY: 0,
+            lastMoveY: 0,
+            touching: true,
+            touchStart: 0
+        }
+        item.addEventListener('touchstart',self._touchstart.bind(self,item,index));
+        item.addEventListener('touchmove',self._touchmove.bind(self,item,index));
+        item.addEventListener('touchend',self._touchend.bind(self,item,index));
     });
     //列表初始化为第一项在视口位置
     // self.viewportTop = self.viewport.getBoundingClientRect().top - self.con.getBoundingClientRect().top;
@@ -86,8 +95,8 @@ Picker.prototype._build = function(){
     document.body.insertAdjacentHTML('beforeend',pickerHtml);
 }
 
-Picker.prototype._touchstart = function(item,e){
-    console.log(item);
+Picker.prototype._touchstart = function(item,index,e){
+    console.log(item,index);
     var touch = e.touches[0];
     this.startY = touch.pageY;
     this.lastMoveY = touch.pageY;
