@@ -238,20 +238,34 @@ Picker.prototype._translateTime = function(dom,distance,time,callback){
     var self = this;
     self._transitionTime(dom,time);
     self._move(dom,distance);
-    addTransitionEndOnce(dom,function(){
+
+
+    dom.addEventListener('transitionend', function(){
         self._transitionTime(dom, 0);
         callback && callback();
-    },time);
+    }, {once:true})
+
+    // addTransitionEndOnce(dom,function(){
+    //     self._transitionTime(dom, 0);
+    //     callback && callback();
+    // },time);
 }
 
 Picker.prototype._translateTimeAbs = function(dom,distance,time,callback){
     var self = this;
     self._transitionTime(dom,time);
     self._translate(dom,distance);
-    addTransitionEndOnce(dom,function(){
+
+
+    dom.addEventListener('transitionend', function(){
         self._transitionTime(dom, 0);
         callback && callback();
-    },time);
+    }, {once:true})
+
+    // addTransitionEndOnce(dom,function(){
+    //     self._transitionTime(dom, 0);
+    //     callback && callback();
+    // },time);
 }
 
 Picker.prototype._addClass = function(dom,className){
@@ -262,37 +276,37 @@ Picker.prototype._removeClass = function(dom,className){
     dom.classList.remove(className);
 }
 
-var	transitionEnd=(function(){
-    var body=document.body || document.documentElement,
-        style=body.style;
-    var transEndEventNames = {
-        WebkitTransition : 'webkitTransitionEnd',
-        MozTransition    : 'transitionend',
-        OTransition      : 'oTransitionEnd otransitionend',
-        transition       : 'transitionend'
-    }
-    for(var name in transEndEventNames){
-        if(typeof style[name] === "string"){
-            return transEndEventNames[name]
-        }
-    }
-})();
+// var	transitionEnd=(function(){
+//     var body=document.body || document.documentElement,
+//         style=body.style;
+//     var transEndEventNames = {
+//         WebkitTransition : 'webkitTransitionEnd',
+//         MozTransition    : 'transitionend',
+//         OTransition      : 'oTransitionEnd otransitionend',
+//         transition       : 'transitionend'
+//     }
+//     for(var name in transEndEventNames){
+//         if(typeof style[name] === "string"){
+//             return transEndEventNames[name]
+//         }
+//     }
+// })();
 
-function addTransitionEndOnce(elem,fn,duration){	
-    var called = false;
-    var callback = function(){
-        if (!called){
-            fn();
-            called = true;
-        }
-    };
-    var callbackEnd = function(){
-        callback();
-        setTimeout(callback, duration);
-        elem.removeEventListener(transitionEnd, callbackEnd);
-    }
-    elem.addEventListener(transitionEnd, callbackEnd);
-}
+// function addTransitionEndOnce(elem,fn,duration){	
+//     var called = false;
+//     var callback = function(){
+//         if (!called){
+//             fn();
+//             called = true;
+//         }
+//     };
+//     var callbackEnd = function(){
+//         callback();
+//         setTimeout(callback, duration);
+//         elem.removeEventListener(transitionEnd, callbackEnd);
+//     }
+//     elem.addEventListener(transitionEnd, callbackEnd);
+// }
 
 function mid(mid,min,max){
     if(typeof min === undefined || min == null){
