@@ -178,18 +178,18 @@ Picker.prototype._fixScroll = function(){
             }
         }
     }
-    this._changeActiveItem();
+    this._changeActiveItem(activeIndex);
     // this._fixRotate(activeIndex);
 }
 
-Picker.prototype._changeActiveItem = function(){
+Picker.prototype._changeActiveItem = function(activeIndex){
     //active item激活
     for(var i=0;i<this.itemLen;i++){
         this._removeClass(this.pickerItems[i],'active');
     }
     this._addClass(this.pickerItems[activeIndex],'active');
     //todo 添加activeItem content
-    this.change(activeIndex);
+    //this.change(activeIndex);
 }
 
 Picker.prototype._fixRotate = function(activeIndex){
