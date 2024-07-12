@@ -25,7 +25,7 @@ function Picker(opts){
     // this.movec = this.con.querySelector('.pickers');
     // this.pickerItems = this.movec.querySelectorAll('.picker-item');
     // this.itemLen = this.pickerItems.length;
-    this.wheels = Array.from(this.pickerc.querySelectorAll('.picker-wheel'));
+    this.wheels = Array.prototype.slice.call(this.pickerc.querySelectorAll('.picker-wheel'));
     this.wheels.forEach(function(item,index){
         self.touches[index] = {
             startY: 0,

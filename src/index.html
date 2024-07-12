@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>picker test</title>
+    <style>
+        ul,li{margin:0;padding:0;}
+        .pickerwheelc{
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color:#fff;
+            z-index: 10;
+            overflow: hidden;
+            height: 260px;
+        }
+        .picker-pagemask{
+            position: fixed;
+            top:0;
+            left:0;
+            height: 100%;
+            width: 100%;
+            background-color: rgba(0, 0, 0, .6);
+        }
+        .pickers{
+            list-style: none;
+            text-align: center;
+            transition: cubic-bezier(0.23, 1, 0.32, 1) 0s;
+            -webkit-transition: cubic-bezier(0.23, 1, 0.32, 1) 0s;
+        }
+        .picker-viewport{
+            width: 100%;
+            height: 30px;
+            border-top: 1px solid #ccc;
+            border-bottom: 1px solid #ccc;
+            position: absolute;
+            top: 50%;
+            margin-top: -15px;
+        }
+        .picker-item{
+            padding: 10px 0;
+            color:#333;
+        }
+        .picker-item.active{
+            color:red;
+            white-space: nowrap;
+        }
+        .picker-wheels{
+            position: relative;
+            height: 100%;
+        }
+        .picker-wheel{
+            float: left;
+            height: 100%;
+        }
+        /* .picker-wheel{
+            perspective: 800px;
+            -webkit-perspective: 800px;
+            transform-style: preserve-3d;
+            -webkit-transform-style: preserve-3d;
+        }
+        .pickers{
+            transform-style: preserve-3d;
+            -webkit-transform-style: preserve-3d;
+        } */
+        .picker-wheelmask{
+            position: absolute;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: -webkit-gradient(linear,left top,left bottom,from(#ffffff),color-stop(rgba(255,255,255,0)),to(#ffffff));
+            background: -webkit-linear-gradient(top,#ffffff,rgba(255,255,255,0),#ffffff);
+            background: linear-gradient(to bottom,#ffffff,rgba(255,255,255,0),#ffffff);
+            opacity: .9;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>Picker test</h1>
+    <!-- <div class="pickerc">
+        <div class="pickerwheelc">
+            <div class="picker-wheels">
+                <div class="picker-wheel">
+                    <ul class="pickers">
+                        <li class="picker-item">星期一</li>
+                        <li class="picker-item">星期二</li>
+                        <li class="picker-item">星期三</li>
+                        <li class="picker-item">星期四</li>
+                        <li class="picker-item">星期五</li>
+                        <li class="picker-item">星期六</li>
+                        <li class="picker-item">星期日</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="picker-viewport"></div>
+            <div class="picker-wheelmask"></div>
+        </div>
+        <div class="picker-pagemask"></div>
+    </div> -->
+    <script src="./index.js"></script>
+    <script>
+        new Picker({
+            con: '.pickerc',
+            data: [
+                ['星期一','星期二','星期三','星期四','星期五','星期六','星期日'],
+                ['10:00','11:00','12:00','13:00','14:00']
+             ],
+            change: function(val){
+                console.log('val: ' + val);
+            }
+        });
+        // new Picker({
+        //     con: '.pickerc',
+        //     data: [
+        //         [{
+        //             id:'1',
+        //             value:'附近',
+        //             childs:[
+        //                 {id:'1',value:'1000米'},
+        //                 {id:'2',value:'2000米'},
+        //                 {id:'3',value:'3000米'},
+        //                 {id:'4',value:'5000米'},
+        //                 {id:'5',value:'10000米'}
+        //             ]
+        //         },
+        //         {id:'2',value:'上城区'},
+        //         {id:'3',value:'下城区'},
+        //         {id:'4',value:'江干区'},
+        //         {id:'5',value:'拱墅区'},
+        //         {id:'6',value:'西湖区'}]
+        //     ],
+        //     change: function(val){
+        //         console.log('val: ' + val);
+        //     }
+        // });
+    </script>
+</body>
+</html>
