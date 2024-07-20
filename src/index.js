@@ -11,14 +11,14 @@ function Picker(opts){
     this._build();
     //获取dom
     this.pickerc = document.querySelector(opts.con);
-    this.con = this.pickerc.querySelector('.pickerwheelc');
-    this.viewport = this.con.querySelector('.picker-viewport');
+    this.wheelc = this.pickerc.querySelector('.pickerwheelc');
+    this.viewport = this.wheelc.querySelector('.picker-viewport');
 
-    let movec = this.con.querySelector('.pickers');
+    let movec = this.wheelc.querySelector('.pickers');
     let movecHeight = movec.getBoundingClientRect().height;
     this.itemHeight = movecHeight / movec.children.length;
     this.viewport.style.setProperty('--h', this.itemHeight + 'px');
-    this.viewportTop = this.viewport.getBoundingClientRect().top - this.con.getBoundingClientRect().top;
+    this.viewportTop = this.viewport.getBoundingClientRect().top - this.wheelc.getBoundingClientRect().top;
 
     this.transTime = 300;
     this.touches = [];
@@ -45,7 +45,7 @@ function Picker(opts){
 
         this.movec = item.querySelector('.pickers');
         this.itemLen = this.movec.children.length;
-        this._fixScroll();
+        // this._fixScroll();
     });
 
 }
@@ -184,16 +184,17 @@ Picker.prototype._fixScroll = function(activeIndex){
 }
 
 Picker.prototype._changeActiveItem = function(activeIndex){
-    //active item激活
-    // for(var i=0;i<this.itemLen;i++){
-    //     this.movec.children[i]?.classList.remove('active');
-    // }
-
     this.movec.querySelector('.active')?.classList.remove('active');
     this.movec.children[activeIndex]?.classList.add('active');
 
     //todo 添加activeItem content
     //this.change(activeIndex);
+}
+
+Picker.prototype._setActiveItem = function(activeIndex){
+    this._changeActiveItem(activeIndex);
+    // height 列高，itemHeight 行高，selectedIndex 当前列选中的索引
+    this._translateTime(this.movec, this.height/2 - this.itemHeight/2 - this.selectedIndex * this.itemHeight);
 }
 
 Picker.prototype._move = function(dom,detlaY){
@@ -235,14 +236,4 @@ Picker.prototype._translateTime = function(dom,distance,time,callback){
         dom.style.transitionDuration = dom.style.webKitTransitionDuration = time + 'ms';
         callback && callback();
     }, {once:true})
-}
-
-function mid(mid,min,max){
-    if(typeof min === undefined || min == null){
-        min = Number.NEGATIVE_INFINITY;
-    }
-    if(typeof max == undefined || max == null){
-        max = Number.POSITIVE_INFINITY;
-    }
-    return Math.min(Math.max(min,mid),max);
 }
