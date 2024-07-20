@@ -7,6 +7,7 @@ function Picker(opts){
 
     var self = this;
     this.opts = opts;
+    this.defaultIndex = this.opts.data.map(t => 1);
     //插入html
     this._build();
     //获取dom
@@ -16,6 +17,7 @@ function Picker(opts){
 
     let movec = this.wheelc.querySelector('.pickers');
     let movecHeight = movec.getBoundingClientRect().height;
+    this.height = movecHeight;
     this.itemHeight = movecHeight / movec.children.length;
     this.viewport.style.setProperty('--h', this.itemHeight + 'px');
     this.viewportTop = this.viewport.getBoundingClientRect().top - this.wheelc.getBoundingClientRect().top;
@@ -44,20 +46,22 @@ function Picker(opts){
         item.addEventListener('touchend',self._touchend.bind(self,item,index));
 
         this.movec = item.querySelector('.pickers');
-        this.itemLen = this.movec.children.length;
-        // this._fixScroll();
+        this._setActiveItem(this.defaultIndex[index]);
     });
 
 }
 
 Picker.prototype._build = function(){
     var data = this.opts.data;
+
     if(!Array.isArray(data)){
         throw new Error('picker data must be a array');
         return;
     }
+
     var len = data.length,
         width = 100/len + '%';
+
     var wheelHtml = data.map(function(item){
         if(!Array.isArray(item)){
             throw new Error('picker data must be a 2d array');
@@ -80,6 +84,7 @@ Picker.prototype._build = function(){
                     </ul>
                 </div>`;
     }).join('');
+
     var pickerHtml = `<div class="pickerc">
                         <div class="pickerwheelc">
                             <div class="picker-wheels">
@@ -192,9 +197,10 @@ Picker.prototype._changeActiveItem = function(activeIndex){
 }
 
 Picker.prototype._setActiveItem = function(activeIndex){
-    this._changeActiveItem(activeIndex);
+    activeIndex = activeIndex - 1;
     // height 列高，itemHeight 行高，selectedIndex 当前列选中的索引
-    this._translateTime(this.movec, this.height/2 - this.itemHeight/2 - this.selectedIndex * this.itemHeight);
+    this._translateTime(this.movec, this.height/2 - this.itemHeight - activeIndex * this.itemHeight);
+    this._changeActiveItem(activeIndex);
 }
 
 Picker.prototype._move = function(dom,detlaY){
